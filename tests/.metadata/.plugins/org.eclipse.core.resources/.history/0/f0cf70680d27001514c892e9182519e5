@@ -1,0 +1,114 @@
+/*
+ * PerfectHashMap
+ *
+ * Version 1.0
+ *
+ * 2015-07-10
+ *  
+ * (c) Michael Nahas
+ *
+ * CTY 2015 DATA LAN
+ * 
+ * Implement the SimpleMap interface using perfect hash
+ *
+ */
+
+public class PerfectHashMap<V> 
+    implements /* Iterable<Map.Entry<K,V>>, */ SimpleMap<String,V> {
+
+    public final static String[] CONTENTS = { "EthanA", "Zane", "Rishi", "EthanB", "Harry", "Kevin", "Aaron", "JamesD", "Joshua", "Dov", "Joey", "Wesley", "Adithya", "Arjun", "Molly", "Avi", "JamesW", "Andrew"};
+
+    public final static int SIZE = 150;
+
+    String[] keys;
+    Object[] values;
+
+
+    public PerfectHashMap() {
+	keys = new String[SIZE];
+	for (int i = 0; i < CONTENTS.length; i++) {
+	    int index = perfectHash(CONTENTS[i]) % SIZE;
+	    if (keys[index] != null) {
+		throw new RuntimeException("Tried to insert two keys at index " + index + ".  They keys were " + keys[index] + " and " + CONTENTS[i]);
+	    }
+	    keys[index] = CONTENTS[i];
+	}
+
+	values = new Object[SIZE];
+    }
+
+    
+    public static int perfectHash(String s) {
+	int hashcode = 0;
+	if (s.length() >= 1 ) {
+	    hashcode += (int) s.charAt(0) * (int) s.length() << (int) s.length()/2;
+	}
+	if (s.length() >= 2 ) {
+	    hashcode += 10 * ((int) s.charAt(1)* (int) s.length() << (int) s.length()/3 >>> s.charAt(s.length()-1));
+	}
+	if (s.length() >= 3 ) {
+	    hashcode += 100 * ((int) s.charAt(2)* (int) s.length() >> (int) s.length()/2);
+	}
+	if (s.length() >= 1) {
+	    hashcode += (int) s.charAt(s.length()-1);
+	}
+	return hashcode;
+    }
+
+    
+    public int size() {
+	return SIZE;
+    }
+
+    public boolean containsKey(String key) {
+	if (key == null) 
+	    throw new NullPointerException();
+
+	int index = perfectHash(key) % SIZE;
+	if (keys[index] != null && keys[index].equals(key)) {
+	    return true;
+	}
+	else {
+	    return false;
+	}
+    }
+
+
+    public V get(String key) {
+	if (key == null) 
+	    throw new NullPointerException();
+
+	int index = perfectHash(key) % SIZE;
+	if (keys[index] != null && keys[index].equals(key)) {
+	    return (V) values[index];
+	}
+	else {
+	    return null;
+	}
+    }
+
+
+    public V put(String key, V value) {
+	if (key == null) 
+	    throw new NullPointerException();
+
+	int index = perfectHash(key) % SIZE;
+	if (keys[index] != null && keys[index].equals(key)) {
+	    Object temp = values[index];
+	    values[index] = value;
+	    return (V) temp;
+	}
+	else {
+	    throw new UnsupportedOperationException("Key " + key + " is not allowed in the table");
+	}
+    }
+
+
+    public V remove(String key) {
+	if (key == null) 
+	    throw new NullPointerException();
+
+	throw new UnsupportedOperationException("Keys cannot be removed from the perfect hash.");
+    }
+}
+

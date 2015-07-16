@@ -1,0 +1,122 @@
+/*
+ * SimpleOrderedDynamicArrayMapTest
+ *
+ * Version 1.0
+ *
+ * 2015-07-09
+ *  
+ * (c) Michael Nahas
+ *
+ * CTY 2015 DATA LAN
+ * 
+ * Unit tests for a DynamicArrayMap implementation
+ */
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
+import java.util.Random;
+import org.junit.Test;
+
+public class SimpleOrderedDynamicArrayMapTest {
+
+    @Test
+    public void basicTest() {
+	SimpleOrderedDynamicArrayMap<Integer, Integer> map = new SimpleOrderedDynamicArrayMap<Integer, Integer>(null);
+	map.put(0, 10);
+	map.put(1, 11);
+	map.put(2, 12);
+	assertEquals(map.size(), 3);
+	assertEquals((int) map.get(0), 10);
+	assertEquals((int) map.get(1), 11);
+	assertEquals((int) map.get(2), 12);
+    }
+
+    
+    @Test
+    public void putTest() {
+	SimpleOrderedDynamicArrayMap<Integer, Integer> map = new SimpleOrderedDynamicArrayMap<Integer, Integer>(null);
+	map.put(0, 10);
+	map.put(1, 11);
+	map.put(2, 12);
+	assertEquals(map.size(), 3);
+	assertEquals((int) map.get(0), 10);
+	assertEquals((int) map.get(1), 11);
+	assertEquals((int) map.get(2), 12);
+	map.put(3, 13);
+	assertEquals(map.size(), 4);
+	assertEquals((int) map.get(3), 13);
+	map.put(2, 22);
+	assertEquals(map.size(), 4);
+	assertEquals((int) map.get(0), 10);
+	assertEquals((int) map.get(1), 11);
+	assertEquals((int) map.get(2), 22);
+	assertEquals((int) map.get(3), 13);
+    }
+    
+    @Test
+    public void removeTest() {
+	SimpleOrderedDynamicArrayMap<Integer, Integer> map = new SimpleOrderedDynamicArrayMap<Integer, Integer>(null);
+	map.put(0, 10);
+	map.put(1, 11);
+	map.put(2, 12);
+	assertEquals(map.size(), 3);
+	assertEquals((int) map.get(0), 10);
+	assertEquals((int) map.get(1), 11);
+	assertEquals((int) map.get(2), 12);
+	assertEquals((int) map.remove(2), 12);
+	assertEquals(map.size(), 2);
+	//assertEquals((int) map.remove(0), 10);
+	assertEquals(map.size(), 2);
+	assertEquals((int) map.remove(1), 11);
+	assertEquals(map.size(), 0);
+    }
+
+
+
+    @Test
+    public void randomizedTest() {
+	SimpleOrderedDynamicArrayMap<Integer, Integer> map = new SimpleOrderedDynamicArrayMap<Integer, Integer>(null);
+	Random r = new Random();
+	for (int i = 0; i < 1000; i++) {
+	    boolean[] already_added = new boolean[20];
+	    int count = 0;
+	    while (count < already_added.length) {
+		int to_add = r.nextInt(already_added.length);
+		if (!already_added[to_add]) {
+		    map.put(to_add, count);
+		    already_added[to_add] = true;
+		    count++;
+		}
+	    }
+	    for (int j = 0; j < already_added.length; j++) {
+		assertTrue(map.containsKey(j));
+	    }
+	    assertTrue(!map.containsKey(already_added.length));
+	}
+    }
+		
+
+
+    @Test
+    public void performanceTest() {
+	SimpleOrderedDynamicArrayMap<Integer, Integer> map = new SimpleOrderedDynamicArrayMap<Integer, Integer>(null);
+	Random r = new Random();
+	int TEST_SIZE = 10000;
+	for (int i = 0; i < TEST_SIZE; i++) {
+	    map.put(r.nextInt(2*TEST_SIZE), new Integer(i));
+	}
+	final long start_time = System.nanoTime();
+	Integer final_value = null;
+	for (int i = 0; i < TEST_SIZE/100; i++) {
+	    Integer key = r.nextInt(2*TEST_SIZE);
+	    if (map.containsKey(key)) {
+		for (int j = 0; j < 100; j++) {
+		    final_value = map.get(key);
+		}
+	    }
+	}
+	final long end_time = System.nanoTime();
+	assert(end_time - start_time < 1000000);
+    }
+}
